@@ -47,5 +47,6 @@ defmodule AbsintheTestWeb.Endpoint do
   plug Plug.MethodOverride
   plug Plug.Head
   plug Plug.Session, @session_options
-  plug AbsintheTestWeb.Router
+  # plug AbsintheTestWeb.Router
+  plug Absinthe.Plug, schema: AbsintheTestWeb.Schema
 end
