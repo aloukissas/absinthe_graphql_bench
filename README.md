@@ -23,3 +23,9 @@ The sample query you can use for your benchmarks is below - it comes from hard-c
         }
       }
 ```
+
+# References
+
+1. https://github.com/benawad/node-graphql-benchmarks
+2. https://github.com/graphql-crystal/benchmarks
+3. https://github.com/dotansimha/graphql-yoga/tree/main/benchmark
