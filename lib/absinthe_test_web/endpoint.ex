@@ -6,5 +6,7 @@ defmodule AbsintheTestWeb.Endpoint do
     pass: ["*/*"],
     json_decoder: Phoenix.json_library()
 
+  plug AbsintheTestWeb.Plugs.Bench
+
   plug Absinthe.Plug, schema: AbsintheTestWeb.Schema
 end
