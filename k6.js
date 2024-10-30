@@ -7,19 +7,26 @@ const VUS = 1;
 
 export const options = {
   scenarios: {
-    graphql: {
+    graphqlAbsinthe: {
       executor: "constant-vus",
-      exec: "runGraphql",
+      exec: "runGraphqlAbsinthe",
       vus: VUS,
       duration: `${DURATION}s`,
       startTime: "0s",
     },
-    plug: {
+    graphqlYogaBun: {
       executor: "constant-vus",
-      exec: "runPlug",
+      exec: "runGraphqlYogaBun",
       vus: VUS,
       duration: `${DURATION}s`,
       startTime: `${DURATION * 1}s`,
+    },
+    restPlug: {
+      executor: "constant-vus",
+      exec: "runRestPlug",
+      vus: VUS,
+      duration: `${DURATION}s`,
+      startTime: `${DURATION * 2}s`,
     },
   },
 };
@@ -30,39 +37,55 @@ export function handleSummary(data) {
   };
 }
 
-const graphqlTrend = new Trend("bench_graphql_request_latency", true);
-const restTrend = new Trend("bench_rest_request_latency", true);
+const graphqlTrendAbsinthe = new Trend(
+  "bench_graphql_absinthe_request_latency",
+  true
+);
+const graphqlTrendYogaBun = new Trend(
+  "bench_graphql_yoga_bun_request_latency",
+  true
+);
+const restTrend = new Trend("bench_rest_plug_request_latency", true);
 
-const graphqlRate = new Rate("bench_graphql_request_rate");
-const restRate = new Rate("bench_rest_request_rate");
+const graphqlRateAbsinthe = new Rate("bench_graphql_absinthe_request_rate");
+const graphqlRateYogaBun = new Rate("bench_graphql_yoga_bun_request_rate");
+const restRate = new Rate("bench_rest_plug_request_rate");
+
+const query = `
+query GetAuthorsWithBooks {
+  authors {
+    __typename
+    id
+    name
+    company
+    books {
+      __typename
+      id
+      name
+      numPages
+    }
+  }
+}
+`;
 
 const baseUrl = "http://localhost:4000";
+const baseUrlBun = "http://localhost:3000";
 
-export function runGraphql() {
-  const query = `
-    query GetAuthorsWithBooks {
-      authors {
-        __typename
-        id
-        name
-        company
-        books {
-          __typename
-          id
-          name
-          numPages
-        }
-      }
-    }
-  `;
-
+export function runGraphqlAbsinthe() {
   const res = http.post(`${baseUrl}/graphql`, { query });
 
-  graphqlTrend.add(res.timings.duration);
-  graphqlRate.add(1);
+  graphqlTrendAbsinthe.add(res.timings.duration);
+  graphqlRateAbsinthe.add(1);
 }
 
-export function runPlug() {
+export function runGraphqlYogaBun() {
+  const res = http.post(`${baseUrlBun}/graphql`, { query });
+
+  graphqlTrendYogaBun.add(res.timings.duration);
+  graphqlRateYogaBun.add(1);
+}
+
+export function runRestPlug() {
   const res = http.get(`${baseUrl}/authors`);
 
   restTrend.add(res.timings.duration);
